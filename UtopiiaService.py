@@ -45,6 +45,7 @@ serverSocket.listen(5)
 
 while True :
 	(clientSocket, addrInfo) = serverSocket.accept()
+	print("Information : UTOPIIA connected")
 	command = CMD_NONE
 	file = None
 	recvLength = 0
@@ -55,7 +56,7 @@ while True :
 		data = clientSocket.recv(1023)
 
 		if not data :
-			print("disconnected!!")
+			print("Information : UTOPIIA disconnected")
 			clientSocket.close()
 			if process :
 				stopApplication(process, None)
@@ -63,11 +64,11 @@ while True :
 
 		if command != CMD_NONE :
 			if command == CMD_XMIT_APP_REQ :
-				print("APP data!!")
 				file.write(data)
 				recvLength = recvLength + len(data)
+				print("Information : Received application data (%d/%d)"%(recvLength, appLength))
 				if recvLength >= appLength :
-					print("APP data finished!!")
+					print("Information : Receive application completed")
 					command = CMD_NONE
 					file.close()
 					os.chmod("PLC_APP", 755)
@@ -75,17 +76,22 @@ while True :
 		else :
 			(command, value) = getCommandFromData(data)
 			if command == CMD_XMIT_APP_REQ :
-				print("APP!!")
+				print("Request : Receive the application (total length : %d)"%value)
 				file = open("PLC_APP", "wb")
 				recvLength = 0
 				appLength = value
+
+				if len(data) > 5 :
+					file.write(data[5:])
+					recvLength = recvLength + len(data[5:])
 			elif command == CMD_RUN_REQ :
-				print("run!!")
+				print("Request : Start the application")
 				process = runApplication(clientSocket)
 				command = CMD_NONE
 			elif command == CMD_STOP_REQ :
-				print("stop!!")
+				print("Request : Stop the application")
 				stopApplication(process, clientSocket)
 				process = None
 				command = CMD_NONE
-
+			else :
+				print("Request : Unkown request : %d"%command)
