@@ -45,7 +45,7 @@ serverSocket.listen(5)
 
 while True :
 	(clientSocket, addrInfo) = serverSocket.accept()
-	print("Information : UTOPIIA connected")
+	print("Information : MIICA connected")
 	command = CMD_NONE
 	file = None
 	recvLength = 0
@@ -56,7 +56,7 @@ while True :
 		data = clientSocket.recv(1023)
 
 		if not data :
-			print("Information : UTOPIIA disconnected")
+			print("Information : MIICA disconnected")
 			clientSocket.close()
 			if process :
 				stopApplication(process, None)
